@@ -12,6 +12,7 @@ export class CreateCustomerController {
       return res.status(201).json(client);
 
     } catch (error) {
+      // console.log(error.message);
       return res.status(400).json(error);
     }
   }

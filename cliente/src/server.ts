@@ -8,6 +8,4 @@ app.use(router);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT), () => { console.log('listening on port ' + PORT) };
-
-//48:49
+app.listen(PORT, () => { console.log('listening on port ' + PORT) });
