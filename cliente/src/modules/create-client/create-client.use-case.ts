@@ -30,7 +30,10 @@ export class CreateClientUseCase {
     })
 
     const kafkaProducer = new KafkaSendMessage();
-    await kafkaProducer.execute('CUSTOMER_CREATED', createdClient);
+    await kafkaProducer.execute('CUSTOMER_CREATED', {
+      id: createdClient.id,
+      email: createdClient.email
+    });
 
     return createdClient;
   }
