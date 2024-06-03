@@ -14,20 +14,44 @@ datasource db {
 }
 
 model Customer {
-  id         String @id @default(uuid())
+  id         String  @id @default(uuid())
   externalId String
-  email      String @unique
+  email      String  @unique
+  Order      Order[]
 
   @@map("customers")
 }
 
 model Product {
-  id         String   @id @default(uuid())
+  id         String       @id @default(uuid())
   externalId String
   code       String
   quantity   Int
-  createdAt  DateTime @default(now()) @db.Timestamp()
-  updatedAt  DateTime @updatedAt @db.Timestamp()
+  createdAt  DateTime     @default(now()) @db.Timestamp()
+  updatedAt  DateTime     @updatedAt @db.Timestamp()
+  OrderItems OrderItems[]
 
   @@map("prodcuts")
+}
+
+model Order {
+  id         String       @id @default(uuid())
+  customer   Customer     @relation(fields: [customerId], references: [id])
+  customerId String
+  createdAt  DateTime     @default(now()) @db.Timestamp
+  OrderItems OrderItems[]
+  status     String
+
+  @@map("orders")
+}
+
+model OrderItems {
+  id        String  @id @default(uuid())
+  quantity  Int
+  productId String
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
+
+  @@map("orders_items")
 }
