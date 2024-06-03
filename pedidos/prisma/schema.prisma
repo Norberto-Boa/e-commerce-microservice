@@ -20,3 +20,14 @@ model Customer {
 
   @@map("customers")
 }
+
+model Product {
+  id         String   @id @default(uuid())
+  externalId String
+  code       String
+  quantity   Int
+  createdAt  DateTime @default(now()) @db.Timestamp()
+  updatedAt  DateTime @updatedAt @db.Timestamp()
+
+  @@map("prodcuts")
+}
