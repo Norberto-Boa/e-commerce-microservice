@@ -1,7 +1,7 @@
 import { prismaClient } from "../../../infra/database/prismaClient";
 import { hash } from "bcryptjs";
 import { KafkaSendMessage } from "../../../infra/provider/kafka/producer";
-import { GetRoleByNameUseCase } from "../../get-role-by-name/get-role-by-name.usecase";
+import { GetRoleByNameUseCase } from "../../get-role-by-name/usecase/get-role-by-name.usecase";
 
 type CreateClientRequest = {
 	name: string;

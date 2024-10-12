@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { GetRoleByIdUseCase } from "./get-role-by-id.use-case";
+import { GetRoleByIdUseCase } from "../usecase/get-role-by-id.use-case";
 
 export class getRoleByIdController {
 	async handle(req: Request, res: Response) {

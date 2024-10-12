@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { CreateClientUseCase } from "../useCase/create-user.use-case";
-import { GetRoleByNameUseCase } from "../../get-role-by-name/get-role-by-name.usecase";
-import { createUserValidator } from "../../../validators/create-user";
+import { GetRoleByNameUseCase } from "../../get-role-by-name/usecase/get-role-by-name.usecase";
+import { createUserValidator } from "../validators/create-user";
 
 export class CreateCustomerController {
 	async handle(req: Request, res: Response) {
