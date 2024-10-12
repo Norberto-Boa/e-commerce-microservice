@@ -8,9 +8,12 @@ export const errorHandler = (
 	next: NextFunction,
 ) => {
 	if (error instanceof ZodError) {
-		const formattedErrors = error.errors.map((err) => err.message); // Extract only messages
+		const formattedErrors = error.errors.map((err) => ({
+			field: err.path.join("."),
+			message: err.message,
+		})); // Extract only messages
 		return res.status(400).json({
-			message: formattedErrors, // Send array of messages
+			errors: formattedErrors, // Send array of messages
 		});
 	}
 
