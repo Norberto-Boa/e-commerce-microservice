@@ -19,8 +19,22 @@ model Client {
   email     String
   password  String
   phone     String
+  role_id   String
   createdAt DateTime @default(now()) @db.Timestamp()
   updatedAt DateTime @updatedAt @db.Timestamp()
 
+  role Role @relation(fields: [role_id], references: [id])
+
   @@map("clients")
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String
+  clients   Client[]
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @updatedAt @db.Timestamp()
+
+  @@unique([name])
+  @@map("roles")
 }
