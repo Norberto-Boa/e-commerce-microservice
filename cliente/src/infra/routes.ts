@@ -5,6 +5,6 @@ const router = Router();
 
 const createClientController = new CreateCustomerController();
 
-router.post("/client", createClientController.handle);
+router.post("/user/register", createClientController.handle);
 
 export { router };

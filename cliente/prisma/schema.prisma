@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  seed     = "prisma/roleSeeder.ts"
 }
 
 datasource db {
