@@ -1,5 +1,5 @@
 import { prismaClient } from "../../../infra/database/prismaClient";
-import { CreateClientUseCase } from "./create-client.use-case";
+import { CreateClientUseCase } from "./create-user.use-case";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../infra/database/prismaClient", () => ({
@@ -31,6 +31,7 @@ describe("CreateClientUseCase", () => {
 			email: "johndoe@example.com",
 			password: "securepassword",
 			phone: "1234567890",
+			role_id: "j",
 		};
 
 		prismaMock.client.findFirst.mockResolvedValue(null);

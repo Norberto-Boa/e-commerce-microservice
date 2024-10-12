@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Request, Response } from "express";
-import { CreateCustomerController } from "./create-client.controller";
-import { CreateClientUseCase } from "../useCase/create-client.use-case";
+import { CreateCustomerController } from "./create-user.controller";
+import { CreateClientUseCase } from "../useCase/create-user.use-case";
 
 // Mock the CreateClientUseCase
 vi.mock("./create-client.use-case", () => ({

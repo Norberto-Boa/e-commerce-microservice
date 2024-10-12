@@ -6,11 +6,12 @@ type CreateClientRequest = {
 	email: string;
 	password: string;
 	phone: string;
+	role_id: string;
 };
 
 export class CreateClientUseCase {
 	async execute(data: CreateClientRequest) {
-		const client = await prismaClient.client.findFirst({
+		const client = await prismaClient.user.findFirst({
 			where: {
 				email: data.email,
 			},
@@ -18,7 +19,7 @@ export class CreateClientUseCase {
 
 		if (client) throw new Error("Customer already exists!");
 
-		const createdClient = await prismaClient.client.create({
+		const createdClient = await prismaClient.user.create({
 			data: {
 				...data,
 			},
