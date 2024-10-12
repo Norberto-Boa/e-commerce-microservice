@@ -8,7 +8,7 @@ export function generateAutheticationToken(
 
 	const token = sign({ name, role }, key, {
 		subject: userId,
-		expiresIn: "4s",
+		expiresIn: "1h",
 	});
 
 	return token;
