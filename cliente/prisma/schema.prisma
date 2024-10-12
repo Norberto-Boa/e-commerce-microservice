@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Client {
+model User {
   id        String   @id @default(uuid())
   name      String
   email     String
@@ -25,13 +25,13 @@ model Client {
 
   role Role @relation(fields: [role_id], references: [id])
 
-  @@map("clients")
+  @@map("users")
 }
 
 model Role {
   id        String   @id @default(uuid())
   name      String
-  clients   Client[]
+  users     User[]
   createdAt DateTime @default(now()) @db.Timestamp()
   updatedAt DateTime @updatedAt @db.Timestamp()
 
