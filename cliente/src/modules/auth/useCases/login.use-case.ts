@@ -1,7 +1,7 @@
 import { compare } from "bcryptjs";
-import { GetUserByEmailUseCase } from "../../get-user-by-email/usecase/get-user-by-email.usecase";
+import { GetUserByEmailUseCase } from "../../user/get-user-by-email/usecase/get-user-by-email.usecase";
 import { generateAutheticationToken } from "../../../utils/generateToken";
-import { GetRoleByIdUseCase } from "../../get-role-by-id/usecase/get-role-by-id.use-case";
+import { GetRoleByIdUseCase } from "../../role/get-role-by-id/usecase/get-role-by-id.use-case";
 
 interface LoginData {
 	email: string;

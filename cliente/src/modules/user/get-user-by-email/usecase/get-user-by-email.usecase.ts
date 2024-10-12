@@ -1,5 +1,5 @@
 import type { User } from "@prisma/client";
-import { prismaClient } from "../../../infra/database/prismaClient";
+import { prismaClient } from "../../../../infra/database/prismaClient";
 
 export class GetUserByEmailUseCase {
 	async execute(email: string): Promise<User | null> {

@@ -1,4 +1,4 @@
-import { prismaClient } from "../../../infra/database/prismaClient";
+import { prismaClient } from "../../../../infra/database/prismaClient";
 
 export class GetRoleByNameUseCase {
 	async execute(name: string) {
