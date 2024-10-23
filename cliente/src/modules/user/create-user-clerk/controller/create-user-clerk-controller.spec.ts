@@ -94,4 +94,30 @@ describe("Testing Create User Clerk Controller", () => {
 		expect(res.status).not.toHaveBeenCalled();
 		expect(res.json).not.toHaveBeenCalled();
 	});
+
+	it("should return an error when the password is less than 8 characters", async () => {
+		const req = mockRequest({
+			name: "John Doe",
+			roleName: "Admin",
+			password: "short",
+			cpassword: "short",
+			email: "johndoe@example.com",
+			phone: "1234567890",
+		});
+
+		const res = mockResponse();
+
+		// biome-ignore lint/suspicious/noExplicitAny: It is way complicated to get the type of this function properly
+		(createUserValidator.parse as any).mockImplementation(() => {
+			throw new Error("Password must be at least 8 characters long");
+		});
+
+		await expect(
+			createUserClerkController.handle(req as Request, res as Response),
+		).rejects.toThrow("Password must be at least 8 characters long");
+
+		expect(createUserValidator.parse).toHaveBeenCalledWith(req.body);
+		expect(res.status).not.toHaveBeenCalled();
+		expect(res.json).not.toHaveBeenCalled();
+	});
 });

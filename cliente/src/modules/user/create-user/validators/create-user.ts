@@ -3,8 +3,14 @@ import { z } from "zod";
 export const createUserValidator = z
 	.object({
 		name: z
-			.string({ required_error: "Name is Required" })
-			.min(1, "Name is required"),
+			.string({
+				required_error: "Name is required",
+			})
+			.trim()
+			.min(1, { message: "Name is required" })
+			.refine((name) => typeof name !== "undefined", {
+				message: "Name is required",
+			}),
 		email: z
 			.string({ required_error: "Email is required" })
 			.email("Invalid email address"),
