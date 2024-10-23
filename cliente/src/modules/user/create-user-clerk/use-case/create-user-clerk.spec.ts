@@ -1,6 +1,6 @@
-import { prismaClient } from "../../../../infra/database/prismaClient";
-import { CreateClientUseCase } from "./create-user.use-case";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { prismaClient } from "../../../../infra/database/prismaClient";
+import { CreateUserClerkUseCase } from "./create-user-clerk.use-case";
 
 vi.mock("../../../../infra/database/prismaClient", () => ({
 	prismaClient: {
@@ -22,14 +22,14 @@ const prismaMock = prismaClient as unknown as {
 	};
 };
 
-describe("CreateClientUseCase", () => {
-	let createClientUseCase: CreateClientUseCase;
+describe("Create Clerk", () => {
+	let createUserClerkUseCase: CreateUserClerkUseCase;
 
 	beforeEach(() => {
-		createClientUseCase = new CreateClientUseCase();
+		createUserClerkUseCase = new CreateUserClerkUseCase();
 	});
 
-	it("Should create a new client", async () => {
+	it("Should be able to create a new User", async () => {
 		const clientData = {
 			name: "John Doe",
 			email: "johndoe@example.com",
@@ -39,14 +39,13 @@ describe("CreateClientUseCase", () => {
 		};
 
 		prismaMock.user.findFirst.mockResolvedValue(null);
-
 		prismaMock.user.create.mockResolvedValue({
 			...clientData,
 			id: "generated-id",
 			password: "hashedPassword",
 		});
 
-		const result = await createClientUseCase.execute(clientData);
+		const result = await createUserClerkUseCase.execute(clientData);
 
 		expect(prismaMock.user.findFirst).toHaveBeenCalledWith({
 			where: { email: clientData.email },

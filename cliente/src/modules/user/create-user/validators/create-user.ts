@@ -16,7 +16,7 @@ export const createUserValidator = z
 			.min(8, "Confirm password must be at least 8 characters long"),
 		roleName: z.enum(
 			["Admin", "Customer", "Vendor", "Support Agent", "Manager"],
-			{ message: "Role Name is not on the list" },
+			{ message: "Role Name is Invalid" },
 		),
 		phone: z
 			.string({ required_error: "Phone is required" })

@@ -47,7 +47,7 @@ describe("CreateCustomerController", () => {
 		req.body = clientData;
 		MockedCreateClientUseCase.execute.mockResolvedValue(clientData);
 
-		await createCustomerController.handleClerk(req as Request, res);
+		await createCustomerController.handle(req as Request, res);
 
 		expect(MockedCreateClientUseCase.prototype.execute).toHaveBeenCalledWith(
 			clientData,
@@ -68,7 +68,7 @@ describe("CreateCustomerController", () => {
 		const error = new Error("Customer already exists!");
 		MockedCreateClientUseCase.prototype.execute.mockRejectedValue(error);
 
-		await createCustomerController.handleClerk(req as Request, res);
+		await createCustomerController.handle(req as Request, res);
 
 		expect(MockedCreateClientUseCase.prototype.execute).toHaveBeenCalledWith(
 			clientData,
