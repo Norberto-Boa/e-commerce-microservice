@@ -10,10 +10,6 @@ vi.mock("./create-client.use-case", () => ({
 	})),
 }));
 
-const MockedCreateClientUseCase = CreateClientUseCase as unknown as ReturnType<
-	typeof vi.fn
->;
-
 // Helper function to create a mock response object
 const createMockResponse = () => {
 	const res: Partial<Response> = {};
@@ -26,12 +22,16 @@ describe("CreateCustomerController", () => {
 	let createCustomerController: CreateCustomerController;
 	let req: Partial<Request>;
 	let res: Response;
+	let MockedCreateClientUseCase: any;
 
 	beforeEach(() => {
 		createCustomerController = new CreateCustomerController();
 		req = {};
 		res = createMockResponse();
 		vi.clearAllMocks();
+		MockedCreateClientUseCase = {
+			execute: vi.fn(),
+		};
 	});
 
 	it("should return 201 and the created client on success", async () => {
@@ -39,13 +39,15 @@ describe("CreateCustomerController", () => {
 			name: "John Doe",
 			email: "johndoe@example.com",
 			password: "securepassword",
+			cpassword: "securepassword",
 			phone: "1234567890",
+			roleName: "Customer",
 		};
 
 		req.body = clientData;
-		MockedCreateClientUseCase.prototype.execute.mockResolvedValue(clientData);
+		MockedCreateClientUseCase.execute.mockResolvedValue(clientData);
 
-		await createCustomerController.handle(req as Request, res);
+		await createCustomerController.handleClerk(req as Request, res);
 
 		expect(MockedCreateClientUseCase.prototype.execute).toHaveBeenCalledWith(
 			clientData,
@@ -66,7 +68,7 @@ describe("CreateCustomerController", () => {
 		const error = new Error("Customer already exists!");
 		MockedCreateClientUseCase.prototype.execute.mockRejectedValue(error);
 
-		await createCustomerController.handle(req as Request, res);
+		await createCustomerController.handleClerk(req as Request, res);
 
 		expect(MockedCreateClientUseCase.prototype.execute).toHaveBeenCalledWith(
 			clientData,

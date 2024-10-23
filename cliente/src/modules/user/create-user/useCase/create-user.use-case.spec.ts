@@ -1,18 +1,24 @@
-import { prismaClient } from "../../../infra/database/prismaClient";
+import { hash } from "bcryptjs";
+import { prismaClient } from "../../../../infra/database/prismaClient";
 import { CreateClientUseCase } from "./create-user.use-case";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { date } from "zod";
 
-vi.mock("../../infra/database/prismaClient", () => ({
+vi.mock("../../../../infra/database/prismaClient", () => ({
 	prismaClient: {
-		client: {
+		user: {
 			findFirst: vi.fn(),
 			create: vi.fn(),
 		},
 	},
 }));
 
+vi.mock("bcryptjs", () => ({
+	hash: vi.fn().mockResolvedValue("hashedPassword"),
+}));
+
 const prismaMock = prismaClient as unknown as {
-	client: {
+	user: {
 		findFirst: ReturnType<typeof vi.fn>;
 		create: ReturnType<typeof vi.fn>;
 	};
@@ -34,16 +40,34 @@ describe("CreateClientUseCase", () => {
 			role_id: "j",
 		};
 
-		prismaMock.client.findFirst.mockResolvedValue(null);
+		prismaMock.user.findFirst.mockResolvedValue(null);
 
-		prismaMock.client.create.mockResolvedValue(clientData);
+		prismaMock.user.create.mockResolvedValue({
+			...clientData,
+			id: "generated-id",
+			password: "hashedPassword",
+		});
 
 		const result = await createClientUseCase.execute(clientData);
 
-		expect(prismaMock.client.findFirst).toHaveBeenCalledWith({
+		expect(prismaMock.user.findFirst).toHaveBeenCalledWith({
 			where: { email: clientData.email },
 		});
 
-		expect(prismaMock.client.create).not.toHaveBeenCalledWith();
+		expect(prismaMock.user.create).toHaveBeenCalledWith({
+			data: {
+				name: clientData.name,
+				email: clientData.email,
+				password: "hashedPassword",
+				phone: clientData.phone,
+				role_id: clientData.role_id,
+			},
+		});
+
+		expect(result).toMatchObject({
+			...clientData,
+			id: "generated-id",
+			password: "hashedPassword",
+		});
 	});
 });
