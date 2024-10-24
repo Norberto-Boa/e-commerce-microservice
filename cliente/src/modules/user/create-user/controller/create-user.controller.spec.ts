@@ -155,4 +155,35 @@ describe("CreateCustomerController", () => {
 			message: "Invalid data",
 		});
 	});
+
+	it("should throw an error when role is a clerk(Admin, Support Agent, Manager)", async () => {
+		const req = mockRequest({
+			name: "John Doe",
+			roleName: "Admin",
+			password: "short",
+			cpassword: "short",
+			email: "johndoe@example",
+			phone: "ascsd123243",
+		});
+
+		const res = mockResponse();
+
+		(createUserValidator.parse as Mock).mockResolvedValue(req.body);
+
+		try {
+			await createCustomerController.handle(req as Request, res as Response);
+		} catch (error) {
+			errorHandler(
+				error as Error,
+				req as Request,
+				res as Response,
+				mockNext as NextFunction,
+			);
+		}
+
+		expect(res.status).toHaveBeenCalledWith(500);
+		expect(res.json).toHaveBeenCalledWith({
+			message: "Invalid role!",
+		});
+	});
 });
