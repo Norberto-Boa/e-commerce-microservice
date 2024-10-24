@@ -6,12 +6,7 @@ import { CreateUserClerkController } from "./create-user-clerk.controller";
 import { ZodError, type z } from "zod";
 import type { NextFunction, Request, Response } from "express";
 import { errorHandler } from "../../../../middleware/errorHandler";
-import type { Role, User } from "@prisma/client";
 import type { CreateClientUseCase } from "../../create-user/useCase/create-user.use-case";
-
-// vi.mock("../../../role/get-role-by-name/usecase/get-role-by-name.usecase");
-// vi.mock("../../create-user/useCase/create-user.use-case");
-// vi.mock("../../create-user/validators/create-user");
 
 vi.mock(
 	"../../../role/get-role-by-name/usecase/get-role-by-name.usecase",
@@ -34,37 +29,10 @@ vi.mock("../../create-user/validators/create-user", () => ({
 	},
 }));
 
-const mockedGetRoleByNameUseCase = vi.mocked(GetRoleByNameUseCase);
-const mockedCreateUserClerkUseCase = vi.mocked(CreateUserClerkUseCase);
-
 describe("Testing Create User Clerk Controller", () => {
 	let createUserClerkController: CreateUserClerkController;
 	let mockGetRoleByNameUseCase: InstanceType<typeof GetRoleByNameUseCase>;
 	let mockCreateUserClerkUseCase: InstanceType<typeof CreateUserClerkUseCase>;
-
-	beforeEach(() => {
-		vi.clearAllMocks();
-
-		mockGetRoleByNameUseCase = new GetRoleByNameUseCase();
-		mockCreateUserClerkUseCase = new CreateUserClerkUseCase();
-
-		createUserClerkController = new CreateUserClerkController(
-			mockCreateUserClerkUseCase as unknown as CreateClientUseCase,
-			mockGetRoleByNameUseCase as unknown as GetRoleByNameUseCase,
-		);
-	});
-
-	// const mockCreateUserClerkController = vi.fn<CreateUserClerkController, []>(
-	// 	() => {
-	// 		return {
-	// 			handle: vi.fn(),
-	// 		};
-	// 	},
-	// );
-
-	// const createUserClerkController = mockCreateUserClerkController();
-	// const mockGetRoleByNameUseCase = new GetRoleByNameUseCase();
-	// const mockCreateUserClerkUseCase = new CreateUserClerkUseCase();
 
 	const mockRequest = (
 		body: z.infer<typeof createUserValidator>,
@@ -81,11 +49,19 @@ describe("Testing Create User Clerk Controller", () => {
 		return res;
 	};
 
-	// beforeEach(() => {
-	// 	vi.clearAllMocks();
-	// });
+	beforeEach(() => {
+		vi.clearAllMocks();
 
-	it("should return 400 when if validation fails", async () => {
+		mockGetRoleByNameUseCase = new GetRoleByNameUseCase();
+		mockCreateUserClerkUseCase = new CreateUserClerkUseCase();
+
+		createUserClerkController = new CreateUserClerkController(
+			mockCreateUserClerkUseCase as unknown as CreateClientUseCase,
+			mockGetRoleByNameUseCase as unknown as GetRoleByNameUseCase,
+		);
+	});
+
+	it("should return 400 when validation fails", async () => {
 		const req = mockRequest({
 			name: "",
 			roleName: "Admin",
