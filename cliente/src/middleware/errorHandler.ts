@@ -14,6 +14,7 @@ export const errorHandler = (
 		})); // Extract only messages
 		return res.status(400).json({
 			errors: formattedErrors, // Send array of messages
+			message: "Invalid data",
 		});
 	}
 

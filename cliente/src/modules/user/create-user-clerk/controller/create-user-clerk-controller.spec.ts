@@ -1,10 +1,17 @@
 import { GetRoleByNameUseCase } from "../../../role/get-role-by-name/usecase/get-role-by-name.usecase";
 import { CreateUserClerkUseCase } from "../use-case/create-user-clerk.use-case";
 import { createUserValidator } from "../../create-user/validators/create-user";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { CreateUserClerkController } from "./create-user-clerk.controller";
-import type { z } from "zod";
-import type { Request, Response } from "express";
+import { ZodError, type z } from "zod";
+import type { NextFunction, Request, Response } from "express";
+import { errorHandler } from "../../../../middleware/errorHandler";
+import type { Role, User } from "@prisma/client";
+import type { CreateClientUseCase } from "../../create-user/useCase/create-user.use-case";
+
+// vi.mock("../../../role/get-role-by-name/usecase/get-role-by-name.usecase");
+// vi.mock("../../create-user/useCase/create-user.use-case");
+// vi.mock("../../create-user/validators/create-user");
 
 vi.mock(
 	"../../../role/get-role-by-name/usecase/get-role-by-name.usecase",
@@ -27,14 +34,45 @@ vi.mock("../../create-user/validators/create-user", () => ({
 	},
 }));
 
+const mockedGetRoleByNameUseCase = vi.mocked(GetRoleByNameUseCase);
+const mockedCreateUserClerkUseCase = vi.mocked(CreateUserClerkUseCase);
+
 describe("Testing Create User Clerk Controller", () => {
-	const createUserClerkController = new CreateUserClerkController();
+	let createUserClerkController: CreateUserClerkController;
+	let mockGetRoleByNameUseCase: InstanceType<typeof GetRoleByNameUseCase>;
+	let mockCreateUserClerkUseCase: InstanceType<typeof CreateUserClerkUseCase>;
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+
+		mockGetRoleByNameUseCase = new GetRoleByNameUseCase();
+		mockCreateUserClerkUseCase = new CreateUserClerkUseCase();
+
+		createUserClerkController = new CreateUserClerkController(
+			mockCreateUserClerkUseCase as unknown as CreateClientUseCase,
+			mockGetRoleByNameUseCase as unknown as GetRoleByNameUseCase,
+		);
+	});
+
+	// const mockCreateUserClerkController = vi.fn<CreateUserClerkController, []>(
+	// 	() => {
+	// 		return {
+	// 			handle: vi.fn(),
+	// 		};
+	// 	},
+	// );
+
+	// const createUserClerkController = mockCreateUserClerkController();
+	// const mockGetRoleByNameUseCase = new GetRoleByNameUseCase();
+	// const mockCreateUserClerkUseCase = new CreateUserClerkUseCase();
 
 	const mockRequest = (
 		body: z.infer<typeof createUserValidator>,
 	): Partial<Request> => ({
 		body,
 	});
+
+	const next = vi.fn();
 
 	const mockResponse = (): Partial<Response> => {
 		const res: Partial<Response> = {};
@@ -43,81 +81,97 @@ describe("Testing Create User Clerk Controller", () => {
 		return res;
 	};
 
-	it("Should throw a validation error when passwords do not match", async () => {
+	// beforeEach(() => {
+	// 	vi.clearAllMocks();
+	// });
+
+	it("should return 400 when if validation fails", async () => {
 		const req = mockRequest({
-			name: "John Doe",
-			roleName: "Admin",
-			password: "password",
-			cpassword: "differentpassword",
-			email: "johndoe@example.com",
-			phone: "1234567890",
-		});
-
-		const res = mockResponse();
-
-		// biome-ignore lint/suspicious/noExplicitAny: Iy is way complicated to get the type of this function properly
-		(createUserValidator.parse as any).mockImplementation(() => {
-			throw new Error("Passwords do not match");
-		});
-
-		await expect(
-			createUserClerkController.handle(req as Request, res as Response),
-		).rejects.toThrow("Passwords do not match");
-
-		expect(createUserValidator.parse).toHaveBeenCalledWith(req.body);
-		expect(res.status).not.toHaveBeenCalled();
-		expect(res.json).not.toHaveBeenCalled();
-	});
-
-	it("should return an error when the role name is invalid", async () => {
-		const req = mockRequest({
-			name: "John Doe",
-			roleName: "InvalidRole",
-			password: "password",
-			cpassword: "password",
-			email: "johndoe@example.com",
-			phone: "1234567890",
-		});
-
-		const res = mockResponse();
-
-		// biome-ignore lint/suspicious/noExplicitAny: It is way complicated to get the type of this function properly
-		(createUserValidator.parse as any).mockImplementation(() => {
-			throw new Error("Role name is Invalid");
-		});
-
-		await expect(
-			createUserClerkController.handle(req as Request, res as Response),
-		).rejects.toThrow("Role name is Invalid");
-
-		expect(createUserValidator.parse).toHaveBeenCalledWith(req.body);
-		expect(res.status).not.toHaveBeenCalled();
-		expect(res.json).not.toHaveBeenCalled();
-	});
-
-	it("should return an error when the password is less than 8 characters", async () => {
-		const req = mockRequest({
-			name: "John Doe",
+			name: "",
 			roleName: "Admin",
 			password: "short",
 			cpassword: "short",
-			email: "johndoe@example.com",
-			phone: "1234567890",
+			email: "johndoe@example",
+			phone: "ascsd123243",
 		});
 
 		const res = mockResponse();
 
-		// biome-ignore lint/suspicious/noExplicitAny: It is way complicated to get the type of this function properly
-		(createUserValidator.parse as any).mockImplementation(() => {
-			throw new Error("Password must be at least 8 characters long");
+		(createUserValidator.parse as Mock).mockImplementation(() => {
+			throw new ZodError([
+				{
+					path: ["name"],
+					message: "Name is required",
+					code: "invalid_type",
+					expected: "string",
+					received: "undefined",
+				},
+			]);
 		});
 
-		await expect(
-			createUserClerkController.handle(req as Request, res as Response),
-		).rejects.toThrow("Password must be at least 8 characters long");
+		const controller = new CreateUserClerkController(
+			mockCreateUserClerkUseCase as unknown as CreateClientUseCase,
+			mockGetRoleByNameUseCase as unknown as GetRoleByNameUseCase,
+		);
 
-		expect(createUserValidator.parse).toHaveBeenCalledWith(req.body);
-		expect(res.status).not.toHaveBeenCalled();
-		expect(res.json).not.toHaveBeenCalled();
+		try {
+			await controller.handle(req as Request, res as Response);
+		} catch (error) {
+			errorHandler(
+				error as Error,
+				req as Request,
+				res as Response,
+				next as NextFunction,
+			);
+		}
+
+		expect(res.status).toHaveBeenCalledWith(400);
+		expect(res.json).toHaveBeenCalledWith({
+			errors: [{ field: "name", message: "Name is required" }],
+			message: "Invalid data",
+		});
+	});
+
+	it("should return 201 and create a new user when validation passes", async () => {
+		const req = mockRequest({
+			name: "John Doe",
+			roleName: "Admin",
+			password: "password123",
+			cpassword: "password123",
+			email: "johndoe@example.com",
+			phone: "123456789",
+		});
+
+		const res = mockResponse();
+
+		(createUserValidator.parse as Mock).mockReturnValue(req.body);
+
+		(mockGetRoleByNameUseCase.execute as Mock).mockResolvedValue({
+			id: "1",
+			name: "Admin",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
+
+		(mockCreateUserClerkUseCase.execute as Mock).mockResolvedValue({
+			id: "1",
+			name: "John Doe",
+			role_id: "1",
+			password: "hashedPassword",
+			email: "johndoe@example.com",
+			phone: "123456789",
+		});
+
+		await createUserClerkController.handle(req as Request, res as Response);
+
+		expect(res.status).toHaveBeenCalledWith(201);
+		expect(res.json).toHaveBeenCalledWith({
+			id: "1",
+			name: "John Doe",
+			role_id: "1",
+			password: "hashedPassword",
+			email: "johndoe@example.com",
+			phone: "123456789",
+		});
 	});
 });

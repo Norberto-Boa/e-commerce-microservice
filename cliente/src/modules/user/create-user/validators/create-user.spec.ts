@@ -322,8 +322,6 @@ describe("createUserValidator", () => {
 			phone: "123456789",
 		};
 
-		const expectedErrors: ExpectedError[] = [];
-
 		expect(() => createUserValidator.parse(validData)).not.toThrow();
 	});
 });

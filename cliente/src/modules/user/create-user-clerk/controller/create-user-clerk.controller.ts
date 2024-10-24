@@ -1,22 +1,31 @@
 import type { Request, Response } from "express";
-import { GetRoleByNameUseCase } from "../../../role/get-role-by-name/usecase/get-role-by-name.usecase";
-import { CreateClientUseCase } from "../../create-user/useCase/create-user.use-case";
+import type { GetRoleByNameUseCase } from "../../../role/get-role-by-name/usecase/get-role-by-name.usecase";
+import type { CreateClientUseCase } from "../../create-user/useCase/create-user.use-case";
 import { createUserValidator } from "../../create-user/validators/create-user";
 
 export class CreateUserClerkController {
+	private createClientUseCase: CreateClientUseCase;
+	private getRoleByNameUseCase: GetRoleByNameUseCase;
+
+	constructor(
+		createClientUseCase: CreateClientUseCase,
+		getRoleByNameUseCase: GetRoleByNameUseCase,
+	) {
+		this.createClientUseCase = createClientUseCase;
+		this.getRoleByNameUseCase = getRoleByNameUseCase;
+	}
+
 	async handle(req: Request, res: Response) {
-		const useCase = new CreateClientUseCase();
 		const { name, roleName, password, email, phone } =
 			createUserValidator.parse(req.body);
 
-		const getRoleByName = new GetRoleByNameUseCase();
-		const role = await getRoleByName.execute(roleName);
+		const role = await this.getRoleByNameUseCase.execute(roleName);
 
 		if (!role) {
 			throw new Error("Invalid role!");
 		}
 
-		const client = await useCase.execute({
+		const client = await this.createClientUseCase.execute({
 			name,
 			role_id: role.id,
 			email: email,
