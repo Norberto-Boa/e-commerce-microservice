@@ -181,7 +181,7 @@ describe("CreateCustomerController", () => {
 			);
 		}
 
-		expect(res.status).toHaveBeenCalledWith(500);
+		expect(res.status).toHaveBeenCalledWith(400);
 		expect(res.json).toHaveBeenCalledWith({
 			message: "Invalid role!",
 		});

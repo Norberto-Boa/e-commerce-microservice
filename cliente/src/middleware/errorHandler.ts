@@ -18,7 +18,7 @@ export const errorHandler = (
 		});
 	}
 
-	return res.status(500).json({
+	return res.status(400).json({
 		message: error.message,
 	});
 };
